@@ -148,7 +148,7 @@ Kemudian aktifkan "Developer Mode" di system settings.
 
 Aplikasi menggunakan SQLite local database yang tersimpan di:
 ```
-C:\Users\YourUsername\AppData\Local\kasir_digital.db
+C:\Users\<username>\AppData\Local\Kasir Digital\data\kasir_digital.db
 ```
 
 ### Tabel Database:
@@ -267,5 +267,5 @@ Proprietary - Untuk penggunaan internal
 ---
 
 **Status**: ✅ Production Ready
-**Versi**: 1.0.0
+**Versi**: 1.2.11
 **Terakhir Update**: Februari 2026

@@ -20,7 +20,7 @@ Sekarang:
 Setelah instalasi, akan ada struktur seperti ini:
 
 ```
-C:\Program Files\Kasir Digital\
+C:\Users\<username>\AppData\Local\Kasir Digital\
 ├── kasir_digital.exe
 ├── Backup/                    ← Folder auto-created untuk backup otomatis
 │   ├── kasir_backup_2026-02-24_093045.json
@@ -62,8 +62,8 @@ _initializePaths() method
     ↓
 Debug logs:
 - "SettingsProvider: Initialized paths"
-- "Backup path: C:\Program Files\Kasir Digital\Backup"
-- "Export path: C:\Program Files\Kasir Digital\Laporan"
+- "Backup path: C:\Users\<username>\AppData\Local\Kasir Digital\Backup"
+- "Export path: C:\Users\<username>\AppData\Local\Kasir Digital\Laporan"
 ```
 
 ### 3. **Saat Backup Dijadwalkan** (Safe Operation)
@@ -133,10 +133,10 @@ if (!backupFolder.existsSync()) {
 ```
 1. Uninstall aplikasi (jika ada)
 2. Jalankan installer baru
-3. Install di: C:\Program Files\Kasir Digital
+3. Install di: C:\Users\<username>\AppData\Local\Kasir Digital
 4. Cek folder:
-   ✓ C:\Program Files\Kasir Digital\Backup EXIST
-   ✓ C:\Program Files\Kasir Digital\Laporan EXIST
+    ✓ C:\Users\<username>\AppData\Local\Kasir Digital\Backup EXIST
+    ✓ C:\Users\<username>\AppData\Local\Kasir Digital\Laporan EXIST
 5. Double-click kasir_digital.exe
 6. Check console/debug output:
    ✓ "SettingsProvider: Initialized paths"
@@ -149,7 +149,7 @@ if (!backupFolder.existsSync()) {
 2. Go to: Sidebar → Backup → Pengaturan Backup Otomatis
 3. Select: "Setiap Hari"
 4. Wait or restart app
-5. Check: C:\Program Files\Kasir Digital\Backup
+5. Check: C:\Users\<username>\AppData\Local\Kasir Digital\Backup
    ✓ File kasir_backup_YYYY-MM-DD_HHMMSS.json EXIST
    ✓ No error logged
 6. Success notification shown
@@ -160,7 +160,7 @@ if (!backupFolder.existsSync()) {
 1. Open app
 2. Go to: Sidebar → Backup → Export Backup
 3. Save dialog opens (default path: Laporan folder)
-4. Browse to C:\Program Files\Kasir Digital\Laporan
+4. Browse to C:\Users\<username>\AppData\Local\Kasir Digital\Laporan
    ✓ Folder accessible and writable
 5. Export successful
 ```
@@ -219,19 +219,19 @@ Sekarang sistem punya **3 layer** folder creation:
 
 ---
 
-## 🚀 Bonus: Cleanup on Uninstall
+## 🚀 Catatan Uninstall
 
-Installer sekarang juga cleanup folder saat uninstall:
+Installer sekarang tidak lagi menghapus folder data user secara paksa.
 
 ```inno
 [UninstallDelete]
-Type: filesandordirs; Name: "{app}\Backup"
-Type: filesandordirs; Name: "{app}\Laporan"
+Type: dirifempty; Name: "{app}"
 ```
 
-User choices:
-- ✅ Automatic cleanup (recommended)
-- ✅ Manual cleanup (if user untick)
+Implikasi:
+- ✅ File aplikasi terhapus saat uninstall
+- ✅ Data `Backup`, `Laporan`, `data`, dan `assets/images` tetap aman
+- ✅ Folder aplikasi baru ikut hilang jika memang sudah kosong
 
 ---
 
@@ -256,7 +256,7 @@ User choices:
 ✅ **Installer:** Membuat folder `Backup` dan `Laporan` otomatis  
 ✅ **App Init:** Double-check dan ensure folder exists  
 ✅ **Backup Service:** Safe fallback jika folder belum ada  
-✅ **Uninstall:** Cleanup folder dengan proper deletion  
+✅ **Uninstall:** Tidak menghapus data user secara agresif  
 ✅ **Permissions:** User (non-admin) bisa access & modify  
 
 **Result:** Zero error saat backup harian/mingguan dijadwalkan! 🎉

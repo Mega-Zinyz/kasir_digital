@@ -69,7 +69,7 @@ IDI_APP_ICON            ICON                    "resources\\app_icon.ico"
 #if defined(FLUTTER_VERSION)
 #define VERSION_AS_STRING FLUTTER_VERSION
 #else
-#define VERSION_AS_STRING "1.0.0"
+#define VERSION_AS_STRING "1.2.11"
 #endif
 
 VS_VERSION_INFO VERSIONINFO
@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "kasir_digital" "\0"
+            VALUE "CompanyName", "Kasir Digital" "\0"
+            VALUE "FileDescription", "Kasir Digital POS" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "kasir_digital" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2026 com.example. All rights reserved." "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 Kasir Digital. All rights reserved." "\0"
             VALUE "OriginalFilename", "kasir_digital.exe" "\0"
-            VALUE "ProductName", "kasir_digital" "\0"
+            VALUE "ProductName", "Kasir Digital" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

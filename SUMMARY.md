@@ -171,7 +171,7 @@ Output: `build/windows/runner/Release/kasir_digital.exe`
 
 Database otomatis dibuat saat pertama kali apps dijalankan:
 
-**Location**: `C:\Users\YourUsername\AppData\Local\kasir_digital.db`
+**Location**: `C:\Users\<username>\AppData\Local\Kasir Digital\data\kasir_digital.db`
 
 **Tables**:
 1. `products` - Simpan barang/produk
@@ -331,5 +331,5 @@ Selamat menikmati aplikasi POS profesional Anda! 🚀
 
 **Project**: kasir_digital
 **Platform**: Windows 10/11
-**Status**: ✅ Production Ready v1.0.0
+**Status**: ✅ Production Ready v1.2.11
 **Last Updated**: February 21, 2026

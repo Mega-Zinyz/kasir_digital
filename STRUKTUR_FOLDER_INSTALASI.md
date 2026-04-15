@@ -2,7 +2,7 @@
 
 ## 📁 Lokasi Instalasi Default
 ```
-C:\Program Files\Kasir Digital\
+C:\Users\<username>\AppData\Local\Kasir Digital\
 ```
 
 ## 🗂️ Struktur Folder Lengkap
@@ -63,7 +63,7 @@ final backupFolder = Directory('$appDirectory/Backup');
 ## ✅ Keuntungan Struktur Ini
 
 1. ✅ **Portable** - Semua data/laporan/backup ada dalam satu folder
-2. ✅ **Auto-cleanup saat uninstall** - Installer Inno Setup sudah configure `[UninstallDelete]`
+2. ✅ **Per-user install** - Tidak butuh hak admin untuk instalasi default
 3. ✅ **User-friendly** - Mudah backup dengan copy satu folder `Kasir Digital/`
 4. ✅ **Multi-user safe** - Setiap instalasi punya data tersendiri
 5. ✅ **No Registry leftover** - Hanya folder yang perlu dihapus
@@ -71,7 +71,7 @@ final backupFolder = Directory('$appDirectory/Backup');
 ## 🚀 Proses Instalasi
 
 1. User download installer: `KasirDigital_Installer.exe`
-2. Inno Setup membuat folder: `C:\Program Files\Kasir Digital\`
+2. Inno Setup membuat folder: `C:\Users\<username>\AppData\Local\Kasir Digital\`
 3. Installer copy executable + dependencies ke folder
 4. Installer membuat subfolder: `data/`, `Laporan/`, `Backup/`, `assets/images/`
 5. Aplikasi pertama kali buka → auto-create database `kasir_digital.db`
@@ -81,13 +81,11 @@ final backupFolder = Directory('$appDirectory/Backup');
 1. User klik "Uninstall Kasir Digital"
 2. Inno Setup hapus:
    - ✅ `kasir_digital.exe` dan DLL files
-   - ✅ `data/` folder beserta `kasir_digital.db`
-   - ✅ `Laporan/` folder beserta semua file export
-   - ✅ `Backup/` folder beserta semua file backup
-   - ✅ `assets/images/` folder beserta semua foto produk
-   - ✅ Folder `Kasir Digital/` jika kosong
+    - ✅ Uninstaller dan shortcut aplikasi
+    - ✅ Folder `Kasir Digital/` jika memang sudah kosong
+    - ℹ️ Folder `data/`, `Laporan/`, `Backup`, dan `assets/images/` tidak dihapus paksa
 
-**Hasil**: Aplikasi + semua file user terhapus 100% ✨
+**Hasil**: File aplikasi dibersihkan, data user tetap aman kecuali dihapus manual.
 
 ## 📝 Installer Configuration (Inno Setup)
 
@@ -101,9 +99,6 @@ Name: "{app}\assets\images"; Permissions: users-full
 Name: "{app}\data"; Permissions: users-full
 
 [UninstallDelete]
-Type: filesandordirs; Name: "{app}\Backup"
-Type: filesandordirs; Name: "{app}\Laporan"
-Type: filesandordirs; Name: "{app}\*"
 Type: dirifempty; Name: "{app}"
 ```
 
@@ -115,4 +110,4 @@ Type: dirifempty; Name: "{app}"
 
 ---
 
-**Status**: ✅ Semua sudah dikonfigurasi dengan benar!
+**Status**: ✅ Sudah selaras dengan installer per-user dan proteksi data user.

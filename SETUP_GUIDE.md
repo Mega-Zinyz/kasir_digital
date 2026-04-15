@@ -206,7 +206,7 @@ CREATE TABLE transaction_items (
 
 Database file tersimpan di:
 ```
-C:\Users\YourUsername\AppData\Local\kasir_digital.db
+C:\Users\<username>\AppData\Local\Kasir Digital\data\kasir_digital.db
 ```
 
 ---
