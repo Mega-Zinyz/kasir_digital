@@ -86,7 +86,7 @@ class _BackupScreenState extends State<BackupScreen> {
           const BackupSectionHeader(title: 'Cadangan Data'),
           const SizedBox(height: 12),
           Text(
-            'Buat cadangan file database Anda. Berguna untuk pencegahan kehilangan data.',
+            'Buat cadangan data aplikasi Anda. Backup mencakup database utama dan gambar produk yang dikelola aplikasi.',
             style: TextStyle(fontSize: 13, color: cs.onSurfaceVariant),
           ),
           const SizedBox(height: 16),
@@ -382,7 +382,7 @@ class _BackupScreenState extends State<BackupScreen> {
                         _buildInfoItem(
                           context,
                           '🔄 Backup Penuh',
-                          'Mencakup semua produk dan riwayat transaksi',
+                          'Mencakup produk, riwayat transaksi, item transaksi, dan gambar produk yang dikelola aplikasi',
                           cs,
                         ),
                       ],

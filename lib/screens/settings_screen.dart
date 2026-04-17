@@ -89,6 +89,143 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  Future<void> _showHistoryDeletePinDialog() async {
+    final settingsProvider = context.read<SettingsProvider>();
+    final currentPinController = TextEditingController();
+    final pinController = TextEditingController();
+    final confirmController = TextEditingController();
+    String? errorText;
+
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (dialogContext, setDialogState) => AlertDialog(
+          title: Text(
+            settingsProvider.hasHistoryDeletePin
+                ? 'Ubah PIN Hapus History'
+                : 'Atur PIN Hapus History',
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (settingsProvider.hasHistoryDeletePin) ...[
+                TextField(
+                  controller: currentPinController,
+                  obscureText: true,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: 'PIN Lama',
+                    hintText: 'Masukkan PIN saat ini',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 12),
+              ],
+              TextField(
+                controller: pinController,
+                obscureText: true,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: 'PIN Baru',
+                  hintText: 'Minimal 4 digit',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: confirmController,
+                obscureText: true,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: 'Konfirmasi PIN',
+                  border: const OutlineInputBorder(),
+                  errorText: errorText,
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            if (settingsProvider.hasHistoryDeletePin)
+              TextButton(
+                onPressed: () async {
+                  final currentPin = currentPinController.text.trim();
+
+                  if (!settingsProvider.verifyHistoryDeletePin(currentPin)) {
+                    setDialogState(() {
+                      errorText = 'PIN lama tidak valid';
+                    });
+                    return;
+                  }
+
+                  await settingsProvider.clearHistoryDeletePin();
+                  if (!mounted || !dialogContext.mounted) return;
+
+                  Navigator.pop(dialogContext);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('PIN hapus history berhasil direset'),
+                      backgroundColor: Colors.orange,
+                    ),
+                  );
+                },
+                child: Text(
+                  'Reset PIN',
+                  style: TextStyle(
+                    color: Theme.of(dialogContext).colorScheme.error,
+                  ),
+                ),
+              ),
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Batal'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final currentPin = currentPinController.text.trim();
+                final pin = pinController.text.trim();
+                final confirmPin = confirmController.text.trim();
+
+                if (settingsProvider.hasHistoryDeletePin &&
+                    !settingsProvider.verifyHistoryDeletePin(currentPin)) {
+                  setDialogState(() {
+                    errorText = 'PIN lama tidak valid';
+                  });
+                  return;
+                }
+
+                if (!RegExp(r'^\d{4,8}$').hasMatch(pin)) {
+                  setDialogState(() {
+                    errorText = 'PIN harus 4-8 digit angka';
+                  });
+                  return;
+                }
+
+                if (pin != confirmPin) {
+                  setDialogState(() {
+                    errorText = 'PIN konfirmasi tidak cocok';
+                  });
+                  return;
+                }
+
+                await settingsProvider.setHistoryDeletePin(pin);
+                if (!mounted || !dialogContext.mounted) return;
+
+                Navigator.pop(dialogContext);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('PIN hapus history berhasil disimpan'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              },
+              child: const Text('Simpan'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -329,6 +466,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 },
               );
             },
+          ),
+          const SizedBox(height: 24),
+          const SectionHeader(title: 'Keamanan Transaksi'),
+          Consumer<SettingsProvider>(
+            builder: (context, settingsProvider, _) => SettingsTile(
+              icon: Icons.lock_outline,
+              title: 'PIN Hapus History',
+              subtitle: settingsProvider.historyDeletePinStatus,
+              onTap: _showHistoryDeletePinDialog,
+            ),
           ),
           const SizedBox(height: 24),
           const SectionHeader(title: 'Perangkat Terhubung'),

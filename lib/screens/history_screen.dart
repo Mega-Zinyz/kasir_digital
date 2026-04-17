@@ -940,47 +940,99 @@ class _HistoryScreenState extends State<HistoryScreen> {
     BuildContext context,
     SalesTransaction transaction,
   ) {
+    final settingsProvider = context.read<SettingsProvider>();
+
+    if (!settingsProvider.hasHistoryDeletePin) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('PIN Admin Belum Diatur'),
+          content: const Text(
+            'Atur PIN hapus history di menu Pengaturan sebelum menghapus transaksi.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Tutup'),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    final pinController = TextEditingController();
+    String? pinError;
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Hapus Transaksi'),
-        content: Text('Apakah Anda yakin ingin menghapus transaksi ini?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Batal'),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('Hapus Transaksi'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Masukkan PIN admin untuk menghapus transaksi ${transaction.id.substring(0, 8)}.',
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: pinController,
+                obscureText: true,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: 'PIN Admin',
+                  border: const OutlineInputBorder(),
+                  errorText: pinError,
+                ),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () async {
-              final buildContext = context;
-              Navigator.pop(context);
-              if (!buildContext.mounted) return;
-              try {
-                await buildContext
-                    .read<TransactionProvider>()
-                    .deleteTransaction(transaction.id);
-                if (buildContext.mounted) {
-                  ScaffoldMessenger.of(buildContext).showSnackBar(
-                    SnackBar(content: Text('Transaksi berhasil dihapus')),
-                  );
-                }
-              } catch (e) {
-                if (buildContext.mounted) {
-                  ScaffoldMessenger.of(buildContext).showSnackBar(
-                    SnackBar(
-                      content: Text('Error: ${e.toString()}'),
-                      backgroundColor: Theme.of(buildContext).colorScheme.error,
-                    ),
-                  );
-                }
-              }
-            },
-            child: Text(
-              'Hapus',
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Batal'),
             ),
-          ),
-        ],
+            TextButton(
+              onPressed: () async {
+                if (!settingsProvider.verifyHistoryDeletePin(pinController.text)) {
+                  setDialogState(() {
+                    pinError = 'PIN admin tidak valid';
+                  });
+                  return;
+                }
+
+                final buildContext = context;
+                Navigator.pop(context);
+                if (!buildContext.mounted) return;
+                try {
+                  await buildContext
+                      .read<TransactionProvider>()
+                      .deleteTransaction(transaction.id);
+                  if (buildContext.mounted) {
+                    ScaffoldMessenger.of(buildContext).showSnackBar(
+                      const SnackBar(content: Text('Transaksi berhasil dihapus')),
+                    );
+                  }
+                } catch (e) {
+                  if (buildContext.mounted) {
+                    ScaffoldMessenger.of(buildContext).showSnackBar(
+                      SnackBar(
+                        content: Text('Error: ${e.toString()}'),
+                        backgroundColor: Theme.of(buildContext).colorScheme.error,
+                      ),
+                    );
+                  }
+                }
+              },
+              child: Text(
+                'Hapus',
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

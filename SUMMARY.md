@@ -32,7 +32,7 @@ Halo! Saya telah berhasil membuat **Sistem Point of Sales (POS) yang kompleks da
 #### 🏠 Dashboard
 - Total penjualan bulan ini
 - Stat cards: transaksi, produk, rata-rata nilai
-- Riwayat transaksi terbaru
+- Transaksi terbaru
 - Responsive grid layout
 
 #### 🛒 Halaman Penjualan (POS)
@@ -57,6 +57,7 @@ Halo! Saya telah berhasil membuat **Sistem Point of Sales (POS) yang kompleks da
 - Statistik di atas tabel
 - Detail modal dengan list item belanja
 - Delete transaction
+- Export laporan PDF dan Excel
 
 #### ⚙️ Pengaturan
 - Profil toko
@@ -81,6 +82,7 @@ Halo! Saya telah berhasil membuat **Sistem Point of Sales (POS) yang kompleks da
 - Snackbar notifications
 - Empty state UI
 - Responsive layout
+- Backup data dengan gambar produk yang dikelola aplikasi
 
 ---
 

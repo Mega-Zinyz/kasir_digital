@@ -17,7 +17,7 @@ class HelpScreen extends StatelessWidget {
           _buildFAQItem(
             context,
             'Bagaimana cara menambah produk?',
-            'Untuk menambah produk, pergi ke menu "Daftar Produk" di sidebar kiri. Klik tombol "Tambah Produk" dan isi informasi produk seperti nama, harga, dan stok. Kemudian simpan.',
+            'Untuk menambah produk, buka menu "Daftar Barang" di sidebar kiri. Klik tombol tambah produk lalu isi informasi seperti nama, harga, stok, dan kategori sebelum menyimpan.',
           ),
           _buildFAQItem(
             context,
@@ -27,37 +27,37 @@ class HelpScreen extends StatelessWidget {
           _buildFAQItem(
             context,
             'Bagaimana cara melihat riwayat transaksi?',
-            'Buka menu "Riwayat" di sidebar untuk melihat semua transaksi yang telah dilakukan. Anda dapat melihat detail transaksi seperti tanggal, waktu, produk, dan total harga.',
+            'Buka menu "History" di sidebar untuk melihat semua transaksi yang telah dilakukan. Di halaman ini Anda juga bisa membuka detail transaksi dan export laporan sesuai periode yang dipilih.',
           ),
           _buildFAQItem(
             context,
             'Bagaimana cara membuat backup data?',
-            'Buka menu "Backup" di sidebar. Pilih "Backup Manual" untuk membuat backup sekarang, atau atur jadwal backup otomatis dengan memilih "Setiap Hari" atau "Setiap Minggu".',
+            'Buka menu "Backup" di sidebar. Gunakan tombol export backup untuk membuat backup sekarang, atau atur jadwal backup otomatis dengan memilih "Setiap Hari" atau "Setiap Minggu".',
           ),
           _buildFAQItem(
             context,
             'Bagaimana cara mengexport laporan?',
-            'Buka menu "Laporan" di sidebar. Pilih format export (PDF atau Excel) dan tentukan folder tujuan. Data akan diexport beserta tanggal dan nama file secara otomatis.',
+            'Buka menu "History" di sidebar. Pilih export PDF atau Excel, lalu file laporan akan disimpan ke folder laporan default atau lokasi yang sudah Anda atur di Pengaturan.',
           ),
           _buildFAQItem(
             context,
             'Di mana gambar produk disimpan?',
-            'Gambar produk disimpan secara otomatis di folder aplikasi (/assets/images/). Tidak perlu khawatir gambar hilang karena sudah aman di dalam folder aplikasi dan termasuk dalam backup otomatis.',
+            'Gambar produk disimpan secara otomatis di folder aplikasi pada subfolder assets/images. Sistem membuat salinan gambar ke folder ini agar file tetap aman meskipun file asli dari folder lain sudah dipindah atau dihapus.',
           ),
           _buildFAQItem(
             context,
             'Bagaimana cara mengganti gambar produk?',
-            'Buka menu "Daftar Produk", klik pada produk yang ingin diedit, pilih "Edit Produk", kemudian klik area gambar untuk mengganti. Gambar lama otomatis akan dihapus dan gambar baru akan disimpan.',
+            'Buka menu "Daftar Barang", pilih produk yang ingin diedit, lalu klik area gambar untuk mengganti file. Gambar lama otomatis akan dihapus dan gambar baru akan disimpan oleh sistem.',
           ),
           _buildFAQItem(
             context,
             'Apakah gambar produk ikut dalam backup?',
-            'Ya, semua gambar produk otomatis termasuk dalam backup karena disimpan di folder aplikasi (/assets/images/) yang merupakan bagian dari data aplikasi.',
+            'Ya. Backup aplikasi menyimpan data produk, transaksi, item transaksi, dan salinan gambar produk yang dikelola aplikasi sehingga gambar bisa dipulihkan saat restore.',
           ),
           _buildFAQItem(
             context,
             'Folder backup ada di mana setelah install?',
-            'Folder Backup dan Laporan otomatis dibuat di folder instalasi aplikasi (biasanya: C:\\Program Files\\Kasir Digital\\). Folder sudah siap digunakan untuk backup otomatis.',
+            'Secara default folder Backup dan Laporan dibuat di folder aplikasi, biasanya di C:\\Users\\<username>\\AppData\\Local\\Kasir Digital\\. Lokasi backup dan laporan ini juga bisa diubah dari menu Pengaturan.',
           ),
 
           const SizedBox(height: 24),
@@ -71,7 +71,7 @@ class HelpScreen extends StatelessWidget {
           ),
           _buildUsageItem(
             context,
-            '2. Daftar Produk',
+            '2. Daftar Barang',
             'Kelola inventaris produk Anda. Tambah, edit, atau hapus produk. Pantau stok dan batas stok minimal untuk setiap produk.',
           ),
           _buildUsageItem(
@@ -81,12 +81,12 @@ class HelpScreen extends StatelessWidget {
           ),
           _buildUsageItem(
             context,
-            '4. Riwayat',
-            'Lihat semua transaksi yang telah dilakukan. Filter berdasarkan tanggal dan lihat detail setiap transaksi.',
+            '4. History',
+            'Lihat semua transaksi yang telah dilakukan. Filter berdasarkan tanggal, lihat detail transaksi, dan export laporan penjualan.',
           ),
           _buildUsageItem(
             context,
-            '5. Analisis',
+            '5. Analitik',
             'Lihat grafik penjualan, analisis tren, dan statistik performa produk untuk membantu pengambilan keputusan bisnis.',
           ),
           _buildUsageItem(
@@ -102,11 +102,11 @@ class HelpScreen extends StatelessWidget {
           _buildFeatureDocumentation(
             context,
             'Penyimpanan Gambar Produk',
-            'Gambar produk disimpan secara otomatis di dalam folder aplikasi (/assets/images/). Ketika Anda menambah produk dengan gambar, sistem akan membuat copy gambar ke folder tersebut sehingga aman dan tidak akan hilang meskipun file asli di folder eksternal dihapus.',
+            'Gambar produk disimpan secara otomatis di dalam folder aplikasi pada assets/images. Ketika Anda menambah produk dengan gambar, sistem membuat copy gambar ke folder tersebut sehingga referensi gambar tetap aman dan dapat dipulihkan kembali dari file backup.',
             [
               '✓ Gambar disimpan lokal di dalam aplikasi',
               '✓ Tidak bergantung pada folder eksternal',
-              '✓ Gambar ikut serta saat backup',
+              '✓ Gambar ikut tersimpan saat backup dan restore',
               '✓ Edit gambar otomatis menghapus gambar lama',
               '✓ Hapus produk otomatis menghapus gambar terkait',
             ],
@@ -126,14 +126,14 @@ class HelpScreen extends StatelessWidget {
           _buildFeatureDocumentation(
             context,
             'Backup & Laporan',
-            'Sistem backup otomatis menciptakan folder Backup dan Laporan saat instalasi. Backup otomatis dapat dijadwalkan harian atau mingguan untuk melindungi data bisnis Anda.',
+            'Sistem backup otomatis menciptakan folder Backup dan Laporan saat instalasi. Backup otomatis dapat dijadwalkan harian atau mingguan, dan file backup akan menyimpan data utama beserta gambar produk yang dikelola aplikasi.',
             [
               '✓ Folder Backup dibuat otomatis saat install',
               '✓ Folder Laporan dibuat otomatis saat install',
               '✓ Backup otomatis harian atau mingguan',
               '✓ Manual backup kapan saja dari menu Backup',
               '✓ Export laporan ke Excel atau PDF',
-              '✓ Gambar produk terinclude dalam backup',
+              '✓ Gambar produk ikut tersimpan dalam backup',
             ],
           ),
 
@@ -151,7 +151,7 @@ class HelpScreen extends StatelessWidget {
           ),
           _buildTipItem(
             context,
-            'Gunakan menu Analisis secara berkala untuk memantau performa penjualan dan membuat keputusan bisnis yang lebih baik.',
+            'Gunakan menu Analitik secara berkala untuk memantau performa penjualan dan membuat keputusan bisnis yang lebih baik.',
           ),
           _buildTipItem(
             context,

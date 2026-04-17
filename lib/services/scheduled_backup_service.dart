@@ -1,13 +1,11 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
-import 'package:intl/intl.dart';
-import 'database_service.dart';
-import '../utils/app_constants.dart';
+import 'backup_service.dart';
 
 class ScheduledBackupService {
   late Timer? _backupTimer;
-  final DatabaseService _dbService = DatabaseService();
+  final BackupService _backupService = BackupService();
   
   String? _backupDirectory;
   String? _frequency;
@@ -97,36 +95,22 @@ class ScheduledBackupService {
   /// Perform automatic backup
   Future<void> _performAutoBackup() async {
     try {
-      final products = await _dbService.getAllProducts();
-      final transactions = await _dbService.getAllTransactions();
-      
-      final timestamp = DateFormat('yyyy-MM-dd_HHmmss').format(DateTime.now());
-      final backupData = {
-        'timestamp': DateTime.now().toIso8601String(),
-        'version': AppConstants.appVersion,
-        'products': products.map((p) => p.toJson()).toList(),
-        'transactions': transactions.map((t) => t.toJson()).toList(),
-      };
-      
-      final jsonContent = _formatJson(backupData);
-      final fileName = 'kasir_backup_$timestamp.json';
-      final filePath = '$_backupDirectory/$fileName';
-      
-      await File(filePath).writeAsString(jsonContent);
+      final filePath = await _backupService.exportDatabase(
+        defaultPath: _backupDirectory,
+      );
+
+      if (filePath == null || filePath.isEmpty) {
+        throw Exception('Path backup otomatis tidak tersedia');
+      }
       
       _lastBackupTime = DateTime.now();
-      
+
+      final fileName = filePath.split(Platform.pathSeparator).last;
       onBackupComplete?.call('Backup otomatis berhasil: $fileName');
     } catch (e) {
       onBackupError?.call('Gagal membuat backup otomatis: ${e.toString()}');
       debugPrint('Automatic backup error: $e');
     }
-  }
-
-  /// Format JSON with indentation
-  String _formatJson(dynamic data) {
-    const encoder = JsonEncoder.withIndent('  ');
-    return encoder.convert(data);
   }
 
   /// Stop scheduled backups
@@ -163,60 +147,6 @@ class ScheduledBackupService {
     } catch (e) {
       debugPrint('Error deleting backup: $e');
       return false;
-    }
-  }
-}
-
-class JsonEncoder {
-  final String _indent;
-  
-  const JsonEncoder.withIndent(this._indent);
-  
-  String convert(dynamic data) {
-    final buffer = StringBuffer();
-    _writeValue(data, buffer, 0);
-    return buffer.toString();
-  }
-
-  String _getIndent(int depth) {
-    return _indent * depth;
-  }
-  
-  void _writeValue(dynamic value, StringBuffer buffer, int depth) {
-    if (value == null) {
-      buffer.write('null');
-    } else if (value is bool) {
-      buffer.write(value);
-    } else if (value is num) {
-      buffer.write(value);
-    } else if (value is String) {
-      buffer.write('"');
-      buffer.write(value.replaceAll('\\', '\\\\').replaceAll('"', '\\"'));
-      buffer.write('"');
-    } else if (value is List) {
-      buffer.write('[\n');
-      for (int i = 0; i < value.length; i++) {
-        buffer.write(_getIndent(depth + 1));
-        _writeValue(value[i], buffer, depth + 1);
-        if (i < value.length - 1) buffer.write(',');
-        buffer.write('\n');
-      }
-      buffer.write(_getIndent(depth));
-      buffer.write(']');
-    } else if (value is Map) {
-      buffer.write('{\n');
-      final entries = value.entries.toList();
-      for (int i = 0; i < entries.length; i++) {
-        buffer.write(_getIndent(depth + 1));
-        buffer.write('"${entries[i].key}": ');
-        _writeValue(entries[i].value, buffer, depth + 1);
-        if (i < entries.length - 1) buffer.write(',');
-        buffer.write('\n');
-      }
-      buffer.write(_getIndent(depth));
-      buffer.write('}');
-    } else {
-      buffer.write(value.toString());
     }
   }
 }

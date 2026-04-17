@@ -19,7 +19,7 @@ lib/
 
 ### 2. **Database Layer (SQLite)**
 - ✅ Penyimpanan produk lengkap
-- ✅ Riwayat transaksi penjualan
+- ✅ History transaksi penjualan
 - ✅ Detail item setiap transaksi
 - ✅ CRUD operations lengkap
 - ✅ Query untuk statistik (total sales, transaksi per bulan, dll)
@@ -35,7 +35,7 @@ lib/
 #### 🏠 Dashboard
 - Total penjualan bulan ini
 - Statistik (transaksi, produk, rata-rata)
-- Riwayat transaksi terbaru
+- History transaksi terbaru
 - Mock-up untuk aksi cepat
 
 #### 🛒 Halaman Penjualan (POS)
@@ -296,7 +296,7 @@ C:\Users\<username>\AppData\Local\Kasir Digital\data\kasir_digital.db
 1. Data disimpan lokal - tidak ada upload ke server
 2. Tidak ada authentication (bisa ditambahkan)
 3. Database unencrypted - untuk production, gunakan encrypted database
-4. Backup manual saat ini - setup automated backup untuk production
+4. Backup manual dan otomatis sudah tersedia untuk penggunaan production
 
 ---
 

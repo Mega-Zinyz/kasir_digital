@@ -781,7 +781,36 @@ class _SalesScreenState extends State<SalesScreen> {
     final change = paymentAmount - totalAmount;
     final printer = context.read<HardwareProvider>().printer;
     final printerConnected = printer?.connected == true;
+    final settingsProvider = context.read<SettingsProvider>();
+    final cartProvider = context.read<CartProvider>();
     bool shouldPrintReceipt = true;
+
+    void openReceiptPreview() {
+      final previewTransactionId = const Uuid().v4();
+      final previewItems = cartProvider.toTransactionItems(
+        previewTransactionId,
+      );
+      final previewTransaction = SalesTransaction(
+        id: previewTransactionId,
+        transactionDate: DateTime.now(),
+        totalAmount: totalAmount,
+        paymentAmount: paymentAmount,
+        changeAmount: change,
+        paymentMethod: paymentMethod,
+        status: 'preview',
+        createdAt: DateTime.now(),
+        items: previewItems,
+      );
+
+      _showReceiptPreviewDialog(
+        context,
+        receiptContent: _thermalReceiptService.buildReceiptPreview(
+          storeProfile: settingsProvider.storeProfile,
+          transaction: previewTransaction,
+          items: previewItems,
+        ),
+      );
+    }
 
     showDialog(
       context: context,
@@ -859,44 +888,78 @@ class _SalesScreenState extends State<SalesScreen> {
                   ),
                 ),
                 SizedBox(height: 16),
-                Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: Theme.of(context).colorScheme.outlineVariant,
-                    ),
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Theme.of(context).colorScheme.surfaceContainerLow
-                        : Theme.of(context).colorScheme.surface,
-                  ),
-                  child: CheckboxListTile(
-                    value: shouldPrintReceipt,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 4,
-                    ),
-                    controlAffinity: ListTileControlAffinity.leading,
-                    onChanged: printerConnected
-                        ? (value) {
-                            setDialogState(() {
-                              shouldPrintReceipt = value ?? false;
-                            });
-                          }
-                        : (value) {
-                            setDialogState(() {
-                              shouldPrintReceipt = value ?? false;
-                            });
-                          },
-                    title: Text(
-                      printerConnected
-                          ? 'Cetak struk otomatis'
-                          : 'Simpan struk sebagai file',
-                    ),
-                    subtitle: Text(
-                      printerConnected
-                          ? 'Printer: ${printer?.name ?? 'Thermal Printer'}'
-                          : 'Printer belum ada. Struk disimpan ke folder laporan untuk uji coba.',
-                    ),
+                IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(
+                        flex: 3,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: Theme.of(context).colorScheme.outlineVariant,
+                            ),
+                            color: Theme.of(context).brightness == Brightness.dark
+                                ? Theme.of(context).colorScheme.surfaceContainerLow
+                                : Theme.of(context).colorScheme.surface,
+                          ),
+                          child: CheckboxListTile(
+                            value: shouldPrintReceipt,
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 4,
+                            ),
+                            controlAffinity: ListTileControlAffinity.leading,
+                            onChanged: (value) {
+                              setDialogState(() {
+                                shouldPrintReceipt = value ?? false;
+                              });
+                            },
+                            title: Text(
+                              printerConnected
+                                  ? 'Cetak struk otomatis'
+                                  : 'Cetak struk',
+                            ),
+                            subtitle: Text(
+                              printerConnected
+                                  ? 'Printer: ${printer?.name ?? 'Thermal Printer'}'
+                                  : 'Printer belum terhubung. Gunakan tombol Preview Struk.',
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 12),
+                      Expanded(
+                        flex: 1,
+                        child: Tooltip(
+                          message: 'Preview struk',
+                          child: OutlinedButton.icon(
+                            onPressed: openReceiptPreview,
+                            icon: const Icon(Icons.receipt_long_rounded, size: 22),
+                            label: const Text('Preview'),
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              backgroundColor: Theme.of(context)
+                                  .colorScheme
+                                  .primaryContainer
+                                  .withValues(alpha: 0.35),
+                              foregroundColor: Theme.of(context).colorScheme.primary,
+                              side: BorderSide(
+                                color: Theme.of(context).colorScheme.outlineVariant,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              textStyle: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 SizedBox(height: 24),
@@ -960,7 +1023,6 @@ class _SalesScreenState extends State<SalesScreen> {
   Future<void> _showReceiptPreviewDialog(
     BuildContext context, {
     required String receiptContent,
-    String? savedReceiptPath,
   }) {
     final cs = Theme.of(context).colorScheme;
 
@@ -1000,9 +1062,7 @@ class _SalesScreenState extends State<SalesScreen> {
                             ),
                           ),
                           Text(
-                            savedReceiptPath == null
-                                ? 'Tampilan isi struk yang dikirim/dicetak.'
-                                : 'Salinan struk juga sudah disimpan ke file.',
+                            'Tampilan isi struk sebelum atau sesudah dicetak.',
                             style: TextStyle(color: cs.onSurfaceVariant),
                           ),
                         ],
@@ -1010,24 +1070,6 @@ class _SalesScreenState extends State<SalesScreen> {
                     ),
                   ],
                 ),
-                if (savedReceiptPath != null) ...[
-                  const SizedBox(height: 16),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: cs.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      savedReceiptPath,
-                      style: TextStyle(
-                        color: cs.onSurfaceVariant,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
-                ],
                 const SizedBox(height: 16),
                 Expanded(
                   child: Container(
@@ -1039,15 +1081,40 @@ class _SalesScreenState extends State<SalesScreen> {
                       border: Border.all(color: cs.outlineVariant),
                     ),
                     child: SingleChildScrollView(
-                      child: SelectableText(
-                        receiptContent.trimRight(),
-                        style: TextStyle(
-                          fontSize: 13,
-                          height: 1.5,
-                          color: cs.onSurface,
-                          fontFamily: Platform.isWindows
-                              ? 'Consolas'
-                              : 'monospace',
+                      child: Align(
+                        alignment: Alignment.topCenter,
+                        child: Container(
+                          width: 292,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 18,
+                          ),
+                          decoration: BoxDecoration(
+                            color: cs.surface,
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: cs.outlineVariant.withValues(alpha: 0.7),
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.05),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: SelectableText(
+                            receiptContent.trimRight(),
+                            style: TextStyle(
+                              fontSize: 12.5,
+                              height: 1.65,
+                              color: cs.onSurface,
+                              fontFamily: Platform.isWindows
+                                  ? 'Consolas'
+                                  : 'monospace',
+                              letterSpacing: 0.15,
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -1117,15 +1184,7 @@ class _SalesScreenState extends State<SalesScreen> {
         }
 
         ThermalPrintResult? printResult;
-        File? savedReceiptFile;
-        String? receiptPreview;
         if (shouldPrintReceipt) {
-          receiptPreview = _thermalReceiptService.buildReceiptPreview(
-            storeProfile: settingsProvider.storeProfile,
-            transaction: completedTransaction,
-            items: transactionItems,
-          );
-
           if (printerConnected) {
             printResult = await _thermalReceiptService.printPaymentReceipt(
               storeProfile: settingsProvider.storeProfile,
@@ -1133,21 +1192,11 @@ class _SalesScreenState extends State<SalesScreen> {
               items: transactionItems,
               printerName: hardwareProvider.printer?.name,
             );
-
-            if (!printResult.success) {
-              savedReceiptFile = await _thermalReceiptService.saveReceiptCopy(
-                storeProfile: settingsProvider.storeProfile,
-                transaction: completedTransaction,
-                items: transactionItems,
-                outputDirectory: settingsProvider.exportPath,
-              );
-            }
           } else {
-            savedReceiptFile = await _thermalReceiptService.saveReceiptCopy(
-              storeProfile: settingsProvider.storeProfile,
-              transaction: completedTransaction,
-              items: transactionItems,
-              outputDirectory: settingsProvider.exportPath,
+            printResult = const ThermalPrintResult(
+              success: false,
+              message:
+                  'Printer belum terhubung. Gunakan tombol preview untuk melihat struk.',
             );
           }
         }
@@ -1162,19 +1211,13 @@ class _SalesScreenState extends State<SalesScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                savedReceiptFile != null && printResult == null
-                  ? 'Transaksi berhasil diproses. Struk disimpan di ${savedReceiptFile.path}'
-                  : savedReceiptFile != null && printResult != null
-                  ? 'Transaksi berhasil diproses. Cetak gagal, struk disimpan di ${savedReceiptFile.path}'
-                  : printResult == null
+                printResult == null
                     ? 'Transaksi berhasil diproses tanpa cetak struk'
                     : printResult.success
                     ? 'Transaksi berhasil diproses dan struk dicetak'
                     : 'Transaksi berhasil diproses. ${printResult.message}',
               ),
-                backgroundColor: savedReceiptFile != null
-                  ? Theme.of(context).colorScheme.primary
-                  : printResult == null
+                backgroundColor: printResult == null
                   ? Theme.of(context).colorScheme.primary
                   : printResult.success
                   ? Theme.of(context).colorScheme.secondary
@@ -1182,14 +1225,6 @@ class _SalesScreenState extends State<SalesScreen> {
               duration: const Duration(seconds: 3),
             ),
           );
-
-          if (receiptPreview != null) {
-            await _showReceiptPreviewDialog(
-              context,
-              receiptContent: receiptPreview,
-              savedReceiptPath: savedReceiptFile?.path,
-            );
-          }
         }
       } catch (e) {
         if (context.mounted) {

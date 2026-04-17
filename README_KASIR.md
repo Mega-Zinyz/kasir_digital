@@ -1,6 +1,6 @@
 # Kasir Digital - Sistem Point of Sales (POS)
 
-Aplikasi Sistem Point of Sales (POS) yang kompleks dan profesional untuk Windows yang dibangun dengan Flutter. Aplikasi ini dirancang untuk memudahkan proses transaksi penjualan, manajemen inventori, dan analisis penjualan.
+Aplikasi Sistem Point of Sales (POS) untuk Windows yang dibangun dengan Flutter. Aplikasi ini dirancang untuk memudahkan proses transaksi penjualan, manajemen inventori, analitik penjualan, export laporan, dan backup data lokal.
 
 ## 📋 Fitur Utama
 
@@ -9,7 +9,7 @@ Aplikasi Sistem Point of Sales (POS) yang kompleks dan profesional untuk Windows
 - Statistik transaksi bulan ini
 - Jumlah total produk di inventory
 - Rata-rata nilai transaksi
-- Riwayat transaksi terbaru dengan detail lengkap
+- Transaksi terbaru dengan detail lengkap
 
 ### 2. **Sistem Penjualan (POS)**
 - Interface penjualan yang responsif dengan layout split (produk & keranjang)
@@ -32,7 +32,7 @@ Aplikasi Sistem Point of Sales (POS) yang kompleks dan profesional untuk Windows
 - Detail modal untuk setiap produk
 - Informasi: Nama, Kode, Harga, Stok, Kategori
 
-### 4. **Riwayat Penjualan**
+### 4. **History Penjualan**
 - Tabel transaksi dengan kolom:
   - Nomor transaksi
   - Tanggal & waktu
@@ -49,7 +49,8 @@ Aplikasi Sistem Point of Sales (POS) yang kompleks dan profesional untuk Windows
 ### 5. **Pengaturan**
 - Profil toko (nama, telepon, alamat)
 - Informasi aplikasi dan versi
-- Fitur backup data
+- Fitur backup data manual dan otomatis
+- Pengaturan folder laporan dan backup
 - Bantuan dan kebijakan privasi
 
 ## 🏗️ Arsitektur Project

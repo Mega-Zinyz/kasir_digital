@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
 import '../models/store_profile.dart';
 
 class SettingsProvider extends ChangeNotifier {
+  static const String _historyDeletePinKey = 'history_delete_pin';
+
   int _lowStockThreshold = 5; // Default value
   String _exportPath = ''; // Default empty, will use file picker
   String _backupPath = ''; // Default empty, auto-created
   String _backupFrequency = 'none'; // none, daily, weekly
   DateTime? _lastBackupTime;
   bool _isFullscreen = true; // Fullscreen by default
+  String _historyDeletePin = '';
   StoreProfile _storeProfile = StoreProfile(
     name: 'Toko Kasir Digital',
     phone: '08xxxxxxxxxx',
@@ -21,10 +25,24 @@ class SettingsProvider extends ChangeNotifier {
   String get backupFrequency => _backupFrequency;
   DateTime? get lastBackupTime => _lastBackupTime;
   bool get isFullscreen => _isFullscreen;
+  bool get hasHistoryDeletePin => _historyDeletePin.isNotEmpty;
+  String get historyDeletePinStatus =>
+      _historyDeletePin.isEmpty ? 'Belum diatur' : 'PIN aktif';
   StoreProfile get storeProfile => _storeProfile;
 
   SettingsProvider() {
     _initializePaths();
+    _loadSecuritySettings();
+  }
+
+  Future<void> _loadSecuritySettings() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      _historyDeletePin = prefs.getString(_historyDeletePinKey) ?? '';
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error loading security settings: $e');
+    }
   }
 
   // Initialize all default paths (export, backup) and create folders
@@ -100,6 +118,27 @@ class SettingsProvider extends ChangeNotifier {
   void setLastBackupTime(DateTime time) {
     _lastBackupTime = time;
     notifyListeners();
+  }
+
+  Future<void> setHistoryDeletePin(String pin) async {
+    final normalizedPin = pin.trim();
+    _historyDeletePin = normalizedPin;
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_historyDeletePinKey, normalizedPin);
+    notifyListeners();
+  }
+
+  Future<void> clearHistoryDeletePin() async {
+    _historyDeletePin = '';
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_historyDeletePinKey);
+    notifyListeners();
+  }
+
+  bool verifyHistoryDeletePin(String pin) {
+    return _historyDeletePin.isNotEmpty && _historyDeletePin == pin.trim();
   }
 
   // Update store profile
